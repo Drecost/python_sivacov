@@ -4,9 +4,9 @@ class Conexao:
 
     def conectar(self):
         conexao = None
-        db_path = 'SIVACOV/sivacov.db'
+        db_path = 'sivacov.db'
         try:
-            conexao = sqlite3.connect(db_path, detect_types=sqlite3.PARSE_DECLTYPES)
+            conexao = sqlite3.connect(db_path, detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
             #conexao = sqlite3.connect(db_path)
         except sqlite3.DatabaseError as err:
             print(f"Erro ao conectar o banco de dados {db_path}.")
@@ -28,8 +28,8 @@ class Conexao:
         cursor.execute(sql)
         conexao.commit()
 
-    def createTableCandidato(self,conexao,cursor):
-        sql = 'CREATE TABLE IF NOT EXISTS Candidato (protocolo INTEGER PRIMARY KEY AUTOINCREMENT, status_vacinado char NOT NULL, data_vacinado date NOT NULL,fk_Cidadao_cod_cidadao int, fk_vacina_cod_vacina int, FOREIGN KEY (fk_Cidadao_cod_cidadao) REFERENCES Cidadao (cod_cidadao),FOREIGN KEY (fk_Vacina_cod_vacina) REFERENCES Vacina (cod_vacina));'
+    def createTableVacinado(self,conexao,cursor):
+        sql = 'CREATE TABLE IF NOT EXISTS Vacinado (protocolo INTEGER PRIMARY KEY AUTOINCREMENT, status_vacinado char NOT NULL, data_vacinado date NOT NULL,fk_Cidadao_cod_cidadao int, fk_Vacina_cod_vacina int, FOREIGN KEY (fk_Cidadao_cod_cidadao) REFERENCES Cidadao (cod_cidadao),FOREIGN KEY (fk_Vacina_cod_vacina) REFERENCES Vacina (cod_vacina));'
         cursor.execute(sql)
         conexao.commit()
 
@@ -40,7 +40,8 @@ class Conexao:
 
     def createTableVacinacao(self,conexao,cursor):
         sql = 'CREATE TABLE IF NOT EXISTS Vacinacao (fk_Vacina_cod_vacina int, fk_Etapa_id_etapa int,PRIMARY KEY (fk_Vacina_cod_vacina, fk_Etapa_id_etapa),FOREIGN KEY (fk_Vacina_cod_vacina) REFERENCES Vacina (cod_vacina),FOREIGN KEY (fk_Etapa_id_etapa) REFERENCES Etapa (id_etapa));'
-
+        cursor.execute(sql)
+        conexao.commit()
 
     def createTableEtapa(self,conexao,cursor):
         sql = 'CREATE TABLE IF NOT EXISTS Etapa (id_etapa INTEGER PRIMARY KEY AUTOINCREMENT,nome_etapa varchar NOT NULL,idade INTEGER NOT NULL,categoria varchar NOT NULL,periodo_dose_1 date NOT NULL,periodo_dose_2 date NOT NULL);'
@@ -51,7 +52,9 @@ class Conexao:
         conexao = self.conectar()
         cursor = conexao.cursor()
         self.createTableCidadao(conexao,cursor)
-        self.createTableCandidato(conexao,cursor)
+        self.createTableVacinado(conexao,cursor)
         self.createTableVacina(conexao,cursor)
         self.createTableVacinacao(conexao,cursor)
         self.createTableEtapa(conexao,cursor)
+
+#Autor de feature: André

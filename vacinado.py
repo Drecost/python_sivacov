@@ -2,16 +2,16 @@ import sqlite3
 from sqlite3.dbapi2 import Error
 from conexao import Conexao
 
-class Cidadao:
+class Vacinado:
 
-    def cadastrar(self,cpf,nome,email,telefone,cep,data_nascimento,profissao):
+    def cadastrar(self,status_vacinado,data_vacinado,fk_Cidadao_cod_cidadao,fk_Vacina_cod_vacina):
         try:
             conn = Conexao()
             conexao = conn.conectar()
             cursor = conexao.cursor()
 
-            sql = 'INSERT INTO Cidadao (cpf,nome,email,telefone,cep,data_nascimento,profissao) VALUES (?,?,?,?,?,?,?)'
-            cursor.execute(sql,(cpf,nome,email,telefone,cep,data_nascimento,profissao))
+            sql = 'INSERT INTO Vacinado (status_vacinado,data_vacinado,fk_Cidadao_cod_cidadao,fk_Vacina_cod_vacina) VALUES (?,?,?,?)'
+            cursor.execute(sql,(status_vacinado,data_vacinado,fk_Cidadao_cod_cidadao,fk_Vacina_cod_vacina))
            
             conexao.commit()
             cursor.close()
@@ -19,7 +19,7 @@ class Cidadao:
 
             return True
         except sqlite3.OperationalError as e:
-            print("Erro no cadastro de cidadãos: {}".format(e))
+            print("Erro no cadastro de vacinado: {}".format(e))
             return False
         except sqlite3.IntegrityError as e:
             print("Erro de integridade: {}".format(e))
@@ -33,7 +33,7 @@ class Cidadao:
         cursor = conexao.cursor()
         
         try:
-            resultset =  cursor.execute('SELECT * FROM cidadao').fetchall()
+            resultset =  cursor.execute('SELECT * FROM Vacinado').fetchall()
         except Error as e:
             print(f"O erro '{e}' ocorreu.")
 
@@ -41,18 +41,18 @@ class Cidadao:
         conexao.close()
         return resultset
 
-    def consultar_detalhes(self, cod_cidadao):  
+
+    def consultar_detalhes(self, protocolo):  
         conn = Conexao()
         conexao = conn.conectar()
         cursor = conexao.cursor()
 
+        sql = 'SELECT * FROM Vacinado WHERE protocolo = ?'
 
         try:
-            resultset =  cursor.execute('SELECT * FROM Cidadao WHERE cod_cidadao = ?', (cod_cidadao,)).fetchone()
+            resultset =  cursor.execute(sql,[protocolo]).fetchall()
         except Error as e:
             print(f"O erro '{e}' ocorreu.")
-
-        
 
         cursor.close()
         conexao.close()
@@ -64,7 +64,7 @@ class Cidadao:
         cursor = conexao.cursor()
 
         try:
-            resultset = cursor.execute('SELECT MAX(cod_cidadao) FROM cidadao').fetchone()
+            resultset = cursor.execute('SELECT MAX(protocolo) FROM Vacinado').fetchone()
         except Error as e:
             print(f"O erro '{e}' ocorreu.")
 
@@ -73,14 +73,14 @@ class Cidadao:
         conexao.close()
         return resultset[0]
 
-    def atualizar(self,cod_cidadao,cpf,nome,email,telefone,cep,data_nascimento,profissao):
+    def atualizar(self,protocolo,status_vacinado,data_vacinado,fk_Cidadao_cod_cidadao,fk_Vacina_cod_vacina):
         try:
             conn = Conexao()
             conexao = conn.conectar()
             cursor = conexao.cursor()
 
-            sql = 'UPDATE Cidadao SET cpf = ?, nome = ?, email = ?, telefone = ?, cep = ?, data_nascimento = ?, profissao = ? WHERE cod_cidadao = (?)'
-            cursor.execute(sql,(cpf,nome,email,telefone,cep,data_nascimento,profissao,cod_cidadao))
+            sql = 'UPDATE Vacinado SET status_vacinado = ?, data_vacinado = ?, fk_Cidadao_cod_cidadao = ?, fk_Vacina_cod_vacina = ? WHERE protocolo = (?)'
+            cursor.execute(sql,(status_vacinado,data_vacinado,fk_Cidadao_cod_cidadao,fk_Vacina_cod_vacina,protocolo))
            
             conexao.commit()
             cursor.close()
@@ -88,21 +88,21 @@ class Cidadao:
 
             return True
         except sqlite3.OperationalError as e:
-            print("Erro na atualização de cidadãos: {}".format(e))
+            print("Erro na atualização vacinado: {}".format(e))
             return False
         except sqlite3.IntegrityError as e:
             print("Erro de integridade: {}".format(e))
             return False
+    
 
-
-    def excluir(self,cod_cidadao):
+    def excluir(self,protocolo):
         try:
             conn = Conexao()
             conexao = conn.conectar()
             cursor = conexao.cursor()
 
-            sql = 'DELETE FROM Cidadao WHERE cod_cidadao = (?)'
-            cursor.execute(sql,[cod_cidadao])
+            sql = 'DELETE FROM Vacinado WHERE protocolo = (?)'
+            cursor.execute(sql,[protocolo])
            
             conexao.commit()
             cursor.close()
@@ -110,10 +110,10 @@ class Cidadao:
 
             return True
         except sqlite3.OperationalError as e:
-            print("Erro na exclusão de cidadão: {}".format(e))
+            print("Erro na exclusão de vacinado: {}".format(e))
             return False
         except sqlite3.IntegrityError as e:
             print("Erro de integridade: {}".format(e))
             return False
 
-#Autor de feature: André
+#Autor de feature: Andre, Vitor Dilluca e Wendel
